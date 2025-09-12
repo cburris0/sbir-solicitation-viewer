@@ -1,11 +1,189 @@
 {
-  "id": "55423754-ad13-4cf2-b619-eceb2804a66c",
+  "id": "b3e0f8a4-f0db-439b-8d14-252a349d664e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.hello_world": {
-      "name": "hello_world",
+    "public.solicitations": {
+      "name": "solicitations",
+      "schema": "",
+      "columns": {
+        "solicitation_id": {
+          "name": "solicitation_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "solicitation_title": {
+          "name": "solicitation_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solicitation_number": {
+          "name": "solicitation_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "program": {
+          "name": "program",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phase": {
+          "name": "phase",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agency": {
+          "name": "agency",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solicitation_year": {
+          "name": "solicitation_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "release_date": {
+          "name": "release_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "open_date": {
+          "name": "open_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "close_date": {
+          "name": "close_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "application_due_dates": {
+          "name": "application_due_dates",
+          "type": "date[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "occurrence_number": {
+          "name": "occurrence_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solicitation_agency_url": {
+          "name": "solicitation_agency_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_status": {
+          "name": "current_status",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.solicitation_topics": {
+      "name": "solicitation_topics",
+      "schema": "",
+      "columns": {
+        "topic_number": {
+          "name": "topic_number",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "solicitation_id": {
+          "name": "solicitation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topic_title": {
+          "name": "topic_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "branch": {
+          "name": "branch",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topic_open_date": {
+          "name": "topic_open_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topic_closed_date": {
+          "name": "topic_closed_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "topic_description": {
+          "name": "topic_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sbir_topic_link": {
+          "name": "sbir_topic_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "solicitation_topics_solicitation_id_solicitations_solicitation_id_fk": {
+          "name": "solicitation_topics_solicitation_id_solicitations_solicitation_id_fk",
+          "tableFrom": "solicitation_topics",
+          "tableTo": "solicitations",
+          "columnsFrom": [
+            "solicitation_id"
+          ],
+          "columnsTo": [
+            "solicitation_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subtopics": {
+      "name": "subtopics",
       "schema": "",
       "columns": {
         "id": {
@@ -14,29 +192,29 @@
           "primaryKey": true,
           "notNull": true
         },
-        "hello_world": {
-          "name": "hello_world",
+        "solicitation_topic_id": {
+          "name": "solicitation_topic_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "modified_at": {
-          "name": "modified_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "subtopics_solicitation_topic_id_solicitation_topics_topic_number_fk": {
+          "name": "subtopics_solicitation_topic_id_solicitation_topics_topic_number_fk",
+          "tableFrom": "subtopics",
+          "tableTo": "solicitation_topics",
+          "columnsFrom": [
+            "solicitation_topic_id"
+          ],
+          "columnsTo": [
+            "topic_number"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

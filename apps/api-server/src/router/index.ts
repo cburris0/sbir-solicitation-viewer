@@ -1,9 +1,9 @@
 import { createCallerFactory, createTRPCRouter } from "../trpc";
 
-import { helloWorldRouter } from "./hello-world";
+import { solicitationsRouter } from "./solicitations";
 
 export const router = createTRPCRouter({
-  helloWorld: helloWorldRouter,
+  solicitations: solicitationsRouter
 });
 
 export type AppRouter = typeof router;
