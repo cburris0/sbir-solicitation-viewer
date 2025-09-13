@@ -1,4 +1,5 @@
-import db, { eq, solicitation, SolicitationInsert, solicitationTopic, SolicitationTopicInsert, SolicitationWithRelations, subtopic, SubtopicInsert } from "@repo/database";
+import db, { eq, solicitation, SolicitationInsert, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
+import { SolicitationWithRelations } from "models/solicitations";
 
 export async function createNewSolicitation(solicitationData: SolicitationInsert): Promise<void>
 {
