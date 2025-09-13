@@ -1,11 +1,21 @@
-import { SolicitationRequestParams, SolicitationsQueryParams } from "router/solicitations";
 import * as data from "data/sbir-resp.json";
+import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, listSolicitations } from "services/SolicitationService";
+import { solicitation, SolicitationInsert, SolicitationSelect, SolicitationTopicInsert, SubtopicInsert } from "@repo/database";
+import { SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
 
-export async function listSolicitations(query: SolicitationsQueryParams): Promise<String[]>
+export async function listAllSolicitations(query: SolicitationsQueryParams): Promise<SolicitationSelect[]>
 {
-    // return solicitations from database table
-    console.log("Fetching list of solicitations");
-    return [];
+    try
+    {
+        console.log("Fetching list of solicitations");
+        const solicitations = await listSolicitations();
+        
+        return solicitations;
+    }
+    catch (err)
+    {
+        throw err;
+    }
 }
 
 export async function getSolicitation(req: SolicitationRequestParams): Promise<Object>
@@ -26,9 +36,27 @@ export async function loadSolicitations(): Promise<string>
         // const response = await fetch(url);
         // console.log(`Response from API: ${response.json()}`);
 
-        // but actually get them from the json file
-        const solicitations = data;
-        console.log(`We have ${solicitations.length} solicitations`);
+        // but actually let's get them from the json file
+        const res = data;
+
+        for (const rawSolicitation of res)
+        {
+            console.log(`Inserting ${rawSolicitation.solicitation_id}`);
+            const solicitation = transformSolicitationData(rawSolicitation);
+            await createNewSolicitation(solicitation);
+
+            for (const rawSolicitationTopic of rawSolicitation.solicitation_topics)
+            {
+                const solicitationTopic = transformSolicitationTopicData(rawSolicitationTopic, solicitation.solicitationId);
+                await createNewSolicitationTopic(solicitationTopic);
+
+                for (const rawSubtopic of rawSolicitationTopic.subtopics)
+                {
+                    const subtopic = transformSubtopicData(solicitationTopic.topicNumber);
+                    await createNewSubtopic(subtopic);
+                }
+            }
+        }
 
         return "200"; // TODO: Replace with an http status package
     }
@@ -38,4 +66,45 @@ export async function loadSolicitations(): Promise<string>
         throw err;
     }
 
+    function transformSolicitationData(rawData: any): SolicitationInsert
+    {
+        return {
+            solicitationId: rawData.solicitation_id,
+            solicitationTitle: rawData.solicitation_title,
+            solicitationNumber: rawData.solicitation_number,
+            program: rawData.program,
+            phase: rawData.phase,
+            agency: rawData.agency,
+            branch: rawData.branch,
+            solicitationYear: rawData.solicitation_year,
+            releaseDate: rawData.release_date,
+            openDate: rawData.open_date,
+            closeDate: rawData.close_date,
+            applicationDueDate: [rawData.application_due_date],
+            occurrenceNumber: rawData.occurrence_number,
+            solicitationAgencyUrl: rawData.solicitation_agency_url,
+            currentStatus: rawData.current_status
+        }
+    }
+
+    function transformSolicitationTopicData(rawTopic: any, solicitationId: number): SolicitationTopicInsert 
+    {
+        return {
+            topicNumber: rawTopic.topic_number,
+            solicitationId: solicitationId,
+            topicTitle: rawTopic.topic_title,
+            branch: rawTopic.branch,
+            topicOpenDate: rawTopic.topic_open_date,
+            topicClosedDate: rawTopic.topic_closed_date,
+            topicDescription: rawTopic.topic_description,
+            sbirTopicLink: rawTopic.sbir_topic_link
+        };
+    }
+
+    function transformSubtopicData(topicNumber: string): SubtopicInsert 
+    {
+        return {
+            solicitationTopicId: topicNumber
+        };
+    }
 }

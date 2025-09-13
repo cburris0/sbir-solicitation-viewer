@@ -27,9 +27,10 @@ const config = {
   username: DATABASE_USERNAME,
   password: DATABASE_PASSWORD,
   db: DATABASE_NAME,
-  ssl: process.env.DATABASE_SSL_DISABLED !== "true" && {
-    rejectUnauthorized: false,
-  },
+  ssl: false
+  // ssl: process.env.DATABASE_SSL_DISABLED !== "true" && {
+  //   rejectUnauthorized: false,
+  // },
 };
 
 const db = drizzle(postgres(config));

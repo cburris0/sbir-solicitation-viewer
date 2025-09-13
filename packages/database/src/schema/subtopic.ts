@@ -1,6 +1,7 @@
 import { pgTable, serial, text } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { solicitationTopic } from "./solicitation-topic";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const subtopic = pgTable("subtopics", {
     id: serial("id").primaryKey(),
@@ -13,3 +14,8 @@ export const subtopicRelations = relations(subtopic, ({ one }) => ({
         references: [solicitationTopic.topicNumber]
     })
 }));
+
+export type SubtopicSelect = typeof subtopic.$inferSelect;
+export type SubtopicInsert = typeof subtopic.$inferInsert;
+export const SubtopicSelect = createSelectSchema(subtopic);
+export const SubtopicInsert = createInsertSchema(subtopic);
