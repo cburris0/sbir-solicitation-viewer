@@ -2,6 +2,7 @@ import { ExtractTablesWithRelations } from "drizzle-orm";
 import { PgTransaction } from "drizzle-orm/pg-core";
 import { drizzle, PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import * as schema from "./schema";
 
 const {
   DATABASE_URL,
@@ -33,7 +34,7 @@ const config = {
   // },
 };
 
-const db = drizzle(postgres(config));
+const db = drizzle(postgres(config), { schema });
 
 // client
 export default db;

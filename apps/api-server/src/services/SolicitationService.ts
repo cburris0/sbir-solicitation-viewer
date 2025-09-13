@@ -1,12 +1,12 @@
-import db, { eq, solicitation, SolicitationInsert, SolicitationSelect, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
+import db, { eq, solicitation, SolicitationInsert, solicitationTopic, SolicitationTopicInsert, SolicitationWithRelations, subtopic, SubtopicInsert } from "@repo/database";
 
 export async function createNewSolicitation(solicitationData: SolicitationInsert): Promise<void>
 {
     try
     {
-        const existingSolicitation = await db.select().from(solicitation).where(eq(solicitation.solicitationId, solicitationData.solicitationId));
+        const existingSolicitation = await getSolicitationBySolicitationId(solicitationData.solicitationId);
 
-        if (existingSolicitation.length > 0)
+        if (existingSolicitation)
         {
             console.warn(`Solicitation ${solicitationData.solicitationId} already exists`);
             return;
@@ -66,14 +66,44 @@ export async function createNewSubtopic(subtopicData: SubtopicInsert): Promise<v
     }
 }
 
-export async function listSolicitations(): Promise<SolicitationSelect[]>
+export async function listSolicitations(): Promise<SolicitationWithRelations[]>
 {
     try
     {
-        // will .select populate the relations?
-        const solicitations = await db.select().from(solicitation);
-        console.log(solicitations)
+        const solicitations = await db.query.solicitation.findMany({
+            with: {
+                solicitationTopics: {
+                    with: {
+                        subtopics: true
+                    }
+                }
+            }
+        });
+
         return solicitations;
+    }
+    catch (error)
+    {
+        console.error(error);
+        throw error;
+    }
+}
+
+export async function getSolicitationBySolicitationId(solicitationId: number): Promise<SolicitationWithRelations | undefined>
+{
+    try
+    {
+        const existingSolicitation = await db.query.solicitation.findFirst({
+            where: eq(solicitation.solicitationId, solicitationId),
+            with: {
+                solicitationTopics: {
+                    with: {
+                        subtopics: true
+                    }
+                }
+            }
+        });
+        return existingSolicitation;
     }
     catch (error)
     {

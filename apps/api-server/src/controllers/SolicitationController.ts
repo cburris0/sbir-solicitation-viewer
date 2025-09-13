@@ -1,30 +1,40 @@
 import * as data from "data/sbir-resp.json";
-import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, listSolicitations } from "services/SolicitationService";
-import { solicitation, SolicitationInsert, SolicitationSelect, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
-import { SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
+import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, getSolicitationBySolicitationId, listSolicitations } from "services/SolicitationService";
+import { SolicitationInsert, SolicitationTopicInsert, SubtopicInsert } from "@repo/database";
+import { GetSolicitationResponse, ListAllSolicitationsResponse, SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
+import { TRPCError } from "@trpc/server";
 
-export async function listAllSolicitations(query: SolicitationsQueryParams): Promise<SolicitationSelect[]>
+export async function listAllSolicitations(query: SolicitationsQueryParams | undefined): Promise<ListAllSolicitationsResponse>
 {
     try
     {
         console.log("Fetching list of solicitations");
         const solicitations = await listSolicitations();
-        return solicitations;
+        return { solicitations: solicitations };
     }
     catch (err)
     {
-        throw err;
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Solicitation not found"
+        });
     }
 }
 
-export async function getSolicitation(req: SolicitationRequestParams): Promise<Object>
+export async function getSolicitation(req: SolicitationRequestParams): Promise<GetSolicitationResponse>
 {
-    // return single solicitation based on id
-    console.log("Getting solicitation");
-    return {};
+    console.log("Fetching solicitation by id");
+    const solicitation = await getSolicitationBySolicitationId(req.id);
+    if (solicitation)
+        return solicitation;
+
+    throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Solicitation not found"
+    });
 }
 
-export async function loadSolicitations(): Promise<string>
+export async function loadSolicitations(): Promise<void>
 {
     try
     {
@@ -63,13 +73,14 @@ export async function loadSolicitations(): Promise<string>
                 }
             }
         }
-
-        return "200"; // TODO: Replace with an http status package
     }
     catch (err)
     {
-        // TODO: Better error responses
-        throw err;
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Error loading solicitations",
+            cause: err
+        });
     }
 
     function transformSolicitationData(rawData: any): SolicitationInsert

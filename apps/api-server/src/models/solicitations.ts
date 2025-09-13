@@ -1,4 +1,4 @@
-import { SolicitationSelect } from "@repo/database";
+import { SolicitationSelect, SolicitationTopicSelect, SubtopicSelect } from "@repo/database";
 import { solicitationsRouter } from "router/solicitations";
 import { z } from "zod";
 
@@ -7,19 +7,37 @@ export const SolicitationsQueryParams = z.object({
 
 });
 
-// how to handle responses in trpc
-// export const SolicitationsResponse = z.object({
-//     solicitations: z.array(SolicitationSelect)
-// })
-
-export type SolicitationsQueryParams = z.infer<typeof SolicitationsQueryParams>;
-export type SolicitationsRes = Awaited<ReturnType<typeof solicitationsRouter.listSolicitations>>;
-
-export const SolicitationRequestParams = z.object({
-    id: z.string()
+// TODO: Replace this with full zod def for solicitation
+export const SolicitationWithRelations = z.object({
+    ...SolicitationSelect.shape,
+    solicitationTopics: z.array(
+    z.object({
+        ...SolicitationTopicSelect.shape,
+        subtopics: z.array(z.object({
+        ...SubtopicSelect.shape
+        }))
+    })
+    )
 });
 
+export const SolicitationRequestParams = z.object({
+    id: z.number()
+});
+
+export const ListAllSolicitationsResponse = z.object({
+    solicitations: z.array(SolicitationWithRelations)
+})
+
+export const GetSolicitationResponse = SolicitationWithRelations.extend({
+
+});
+
+
+export type SolicitationWithRelations = z.infer<typeof SolicitationWithRelations>;
+export type SolicitationsQueryParams = z.infer<typeof SolicitationsQueryParams>;
+export type SolicitationsRes = Awaited<ReturnType<typeof solicitationsRouter.listSolicitations>>;
 export type SolicitationRequestParams = z.infer<typeof SolicitationRequestParams>;
 export type SolicitationRes = Awaited<ReturnType<typeof solicitationsRouter.getSolicitation>>;
-
 export type LoadSolicitationRes = Awaited<ReturnType<typeof solicitationsRouter.loadSolicitations>>;
+export type ListAllSolicitationsResponse = Awaited<z.infer<typeof ListAllSolicitationsResponse>>;
+export type GetSolicitationResponse = Awaited<z.infer<typeof GetSolicitationResponse>>;
