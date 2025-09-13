@@ -1,6 +1,6 @@
 import * as data from "data/sbir-resp.json";
 import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, listSolicitations } from "services/SolicitationService";
-import { solicitation, SolicitationInsert, SolicitationSelect, SolicitationTopicInsert, SubtopicInsert } from "@repo/database";
+import { solicitation, SolicitationInsert, SolicitationSelect, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
 import { SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
 
 export async function listAllSolicitations(query: SolicitationsQueryParams): Promise<SolicitationSelect[]>
@@ -9,7 +9,6 @@ export async function listAllSolicitations(query: SolicitationsQueryParams): Pro
     {
         console.log("Fetching list of solicitations");
         const solicitations = await listSolicitations();
-        
         return solicitations;
     }
     catch (err)
@@ -50,10 +49,17 @@ export async function loadSolicitations(): Promise<string>
                 const solicitationTopic = transformSolicitationTopicData(rawSolicitationTopic, solicitation.solicitationId);
                 await createNewSolicitationTopic(solicitationTopic);
 
-                for (const rawSubtopic of rawSolicitationTopic.subtopics)
+                const validSubtopics = rawSolicitationTopic.subtopics.filter(subtopic => 
+                    subtopic && Object.keys(subtopic).length > 0
+                );
+
+                if (validSubtopics.length > 0)
                 {
-                    const subtopic = transformSubtopicData(solicitationTopic.topicNumber);
-                    await createNewSubtopic(subtopic);
+                    for (const rawSubtopic of rawSolicitationTopic.subtopics)
+                    {
+                        const subtopic = transformSubtopicData(rawSubtopic, solicitationTopic.topicNumber);
+                        await createNewSubtopic(subtopic);
+                    }
                 }
             }
         }
@@ -101,10 +107,15 @@ export async function loadSolicitations(): Promise<string>
         };
     }
 
-    function transformSubtopicData(topicNumber: string): SubtopicInsert 
+    function transformSubtopicData(rawSubtopic: any, topicNumber: string): SubtopicInsert 
     {
         return {
-            solicitationTopicId: topicNumber
+            solicitationTopicId: topicNumber,
+            subtopicTitle: rawSubtopic.subtopic_title,
+            branch: rawSubtopic.branch,
+            subtopicNumber: rawSubtopic.subtopic_number,
+            subtopicDescription: rawSubtopic.subtopic_description,
+            sbirSubtopicLink: rawSubtopic.sbir_subtopic_link
         };
     }
 }

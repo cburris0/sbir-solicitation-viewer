@@ -12,7 +12,8 @@
     "build": "tsc",
     "bundle": "esbuild src/server.ts --bundle --platform=node --outfile=bundle/server.js",
     "dev": "concurrently \"tsc --watch --preserveWatchOutput\" \"tsx watch --clear-screen=false src/server.ts\"",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "load-data": "ts-node src/scripts/sbirDataLoader.ts"
   },
   "files": [
     "dist/**"

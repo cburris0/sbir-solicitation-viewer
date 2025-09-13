@@ -5,9 +5,9 @@ import { subtopic } from "./subtopic";
 import { solicitation } from "./solicitation";
 
 export const solicitationTopic = pgTable("solicitation_topics", {
-    topicNumber: text("topic_number").primaryKey(),
+    topicNumber: text("topic_number").primaryKey().notNull(),
     solicitationId: integer("solicitation_id").references(() => solicitation.solicitationId),
-    topicTitle: text("topic_title"),
+    topicTitle: text("topic_title").notNull(),
     branch: text("branch"),
     topicOpenDate: date("topic_open_date"),
     topicClosedDate: date("topic_closed_date"),

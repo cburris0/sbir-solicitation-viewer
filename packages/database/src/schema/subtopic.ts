@@ -1,11 +1,16 @@
-import { pgTable, serial, text } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { solicitationTopic } from "./solicitation-topic";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const subtopic = pgTable("subtopics", {
     id: serial("id").primaryKey(),
-    solicitationTopicId: text("solicitation_topic_id").references(() => solicitationTopic.topicNumber)
+    solicitationTopicId: text("solicitation_topic_id").references(() => solicitationTopic.topicNumber),
+    subtopicTitle: varchar("subtopic_title", { length: 255 }).notNull(),
+    branch: varchar("branch", { length: 4 }),
+    subtopicNumber: varchar("subtopic_number", { length: 15 }).notNull(),
+    subtopicDescription: text("subtopic_description"),
+    sbirSubtopicLink: text("sbir_subtopic_link")
 });
 
 export const subtopicRelations = relations(subtopic, ({ one }) => ({

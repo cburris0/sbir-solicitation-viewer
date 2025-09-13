@@ -1,5 +1,5 @@
 {
-  "id": "b3e0f8a4-f0db-439b-8d14-252a349d664e",
+  "id": "8e5f2ffe-7313-4204-b56c-702df67ee5f3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -18,35 +18,37 @@
           "name": "solicitation_title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "solicitation_number": {
           "name": "solicitation_number",
-          "type": "varchar(255)",
+          "type": "varchar(20)",
           "primaryKey": false,
           "notNull": false
         },
         "program": {
           "name": "program",
-          "type": "varchar(255)",
+          "type": "program",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "phase": {
           "name": "phase",
-          "type": "varchar(255)",
+          "type": "phase",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "agency": {
           "name": "agency",
-          "type": "varchar(255)",
+          "type": "varchar(4)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "branch": {
           "name": "branch",
-          "type": "varchar(255)",
+          "type": "varchar(4)",
           "primaryKey": false,
           "notNull": false
         },
@@ -54,25 +56,25 @@
           "name": "solicitation_year",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "release_date": {
           "name": "release_date",
           "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "open_date": {
           "name": "open_date",
           "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "close_date": {
           "name": "close_date",
           "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "application_due_dates": {
           "name": "application_due_dates",
@@ -82,7 +84,7 @@
         },
         "occurrence_number": {
           "name": "occurrence_number",
-          "type": "varchar(255)",
+          "type": "varchar(1)",
           "primaryKey": false,
           "notNull": false
         },
@@ -90,11 +92,12 @@
           "name": "solicitation_agency_url",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "current_status": {
           "name": "current_status",
-          "type": "varchar(255)",
+          "type": "currentStatus",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         }
@@ -127,7 +130,7 @@
           "name": "topic_title",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "branch": {
           "name": "branch",
@@ -197,6 +200,36 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "subtopic_title": {
+          "name": "subtopic_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "branch": {
+          "name": "branch",
+          "type": "varchar(4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subtopic_number": {
+          "name": "subtopic_number",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subtopic_description": {
+          "name": "subtopic_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sbir_subtopic_link": {
+          "name": "sbir_subtopic_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -222,7 +255,35 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.currentStatus": {
+      "name": "currentStatus",
+      "schema": "public",
+      "values": [
+        "open",
+        "closed",
+        "future"
+      ]
+    },
+    "public.phase": {
+      "name": "phase",
+      "schema": "public",
+      "values": [
+        "Phase I",
+        "Phase II",
+        "BOTH"
+      ]
+    },
+    "public.program": {
+      "name": "program",
+      "schema": "public",
+      "values": [
+        "SBIR",
+        "STTR",
+        "BOTH"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},
