@@ -1,6 +1,19 @@
-export interface SolicitationTopic
+export interface Subtopic
 {
 
+}
+
+export interface SolicitationTopic
+{
+	topicNumber: string,
+    solicitationId: number,
+    topicTitle: string,
+    branch: string | null,
+    topicOpenDate: string | null,
+    topicClosedDate: string | null,
+    topicDescription: string | null,
+    sbirTopicLink: string | null,
+	subtopics: Subtopic[]
 }
 
 export interface Solicitation 

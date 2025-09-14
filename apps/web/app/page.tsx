@@ -1,16 +1,19 @@
 "use client"
 
 import styles from "./page.module.css";
-import { Header } from "./components/Header";
 import { trpc } from "./utils/trpc";
 import SolicitationItem from "./components/SolicitationItem";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Solicitation } from "./interfaces/Solicitation";
 
 export default function Home() {
 	const { data, isLoading, error } = trpc.solicitations.listSolicitations.useQuery();
 	const [searchTerm, setSearchTerm] = useState("");
 	
+    useEffect(() => {
+        document.title = "SBIR Solicitation Viewer"
+    });
+
 	// Filter solicitations based on search term
 	const filteredSolicitations = useMemo(() => {
 		if (!data?.solicitations || !searchTerm.trim()) {
@@ -30,45 +33,44 @@ export default function Home() {
 		});
 	}, [data?.solicitations, searchTerm]);
 	return (
-		<div className={styles.page}>
-			<Header title="SBIR Solicitations" />
+        // We wrap the component in a react fragment since we can only return a single element
+       <>
+            <div className={styles.searchContainer}>
+                <input
+                    type="text"
+                    placeholder="Search solicitations by title, agency, program, phase, or number..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                />
+                {searchTerm && (
+                    <button
+                        onClick={() => setSearchTerm("")}
+                        className={styles.clearButton}
+                    >×</button>
+                )}
+            </div>
 
-			<main className={styles.main}>
-				<div className={styles.searchContainer}>
-					<input
-						type="text"
-						placeholder="Search solicitations by title, agency, program, phase, or number..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className={styles.searchInput}
-					/>
-					{searchTerm && (
-						<button
-							onClick={() => setSearchTerm("")}
-							className={styles.clearButton}
-						>×</button>
-					)}
-				</div>
-				{isLoading && (
-					<div className={styles.loader}>
-					</div>
-				)}
+            {isLoading && (
+                <div className={styles.loader}></div>
+            )}
 
-				{error && (
-					<div className={styles.error}>
-						<p>Error loading solicitations: {error.message}</p>
-					</div>
-				)}
-				{!isLoading && !filteredSolicitations.length && (
-					<div className={styles.noSolicitations}>No Solicitations to Show</div>
-				)}
-				{filteredSolicitations.map((solicitation: Solicitation) => (
-					<SolicitationItem
-						key={solicitation.id || solicitation.solicitationTitle}
-						solicitation={solicitation}
-					/>
-				))}
-			</main>
-		</div>
+            {error && (
+                <div className={styles.error}>
+                    <p>Error loading solicitations: {error.message}</p>
+                </div>
+            )}
+
+            {!isLoading && !filteredSolicitations.length && (
+                <div className={styles.noSolicitations}>No Solicitations to Show</div>
+            )}
+
+            {filteredSolicitations.map((solicitation: Solicitation) => (
+                <SolicitationItem
+                    key={solicitation.id || solicitation.solicitationTitle}
+                    solicitation={solicitation}
+                />
+            ))}
+        </>
 	);
 }

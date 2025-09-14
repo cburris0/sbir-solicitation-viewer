@@ -1,20 +1,10 @@
-
 import React from "react";
 import { Solicitation } from "app/interfaces/Solicitation";
 import styles from "./solicitation-item.module.css";
+import { useRouter } from "next/navigation";
 
-interface ItemProps {
-    solicitation: Solicitation;
-    onClick?: () => void;
-}
-
-export default function SolicitationItem({ solicitation, onClick }: ItemProps) {
-    const handleClick = () => {
-        if (onClick) {
-            onClick();
-        }
-        // TODO: Add routing logic to /solicitation page
-    };
+export default function SolicitationItem({ solicitation }: { solicitation: Solicitation }) {
+    const router = useRouter();
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -34,7 +24,7 @@ export default function SolicitationItem({ solicitation, onClick }: ItemProps) {
     };
 
     return (
-        <div className={styles.card} onClick={handleClick}>
+        <div className={styles.card} onClick={() => router.push(`solicitation/${solicitation.id}`)}>
             <div className={styles.header}>
                 <div className={styles.agency}>
                     {solicitation.agency}

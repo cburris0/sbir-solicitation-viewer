@@ -1,0 +1,23 @@
+.page {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+  background-color: #fafafa;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: 32px; 
+  font-synthesis: none;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 80px;
+  flex: 1;
+}

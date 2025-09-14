@@ -5,6 +5,8 @@ import { trpc } from './utils/trpc';
 import { useState } from 'react';
 import SuperJSON from 'superjson';
 import "./globals.css";
+import styles from "./layout.module.css";
+import { Header } from './components/Header';
 
 export default function RootLayout({
   children,
@@ -26,11 +28,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <div>
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}>
-            {children}
+          <div className={styles.page}>
+            <Header title="SBIR Solicitation Viewer" />
+            <main className={styles.main}>
+              {children}
+            </main>
+          </div>
           </QueryClientProvider>
         </trpc.Provider>
+
+        </div>
       </body>
     </html>
   );
