@@ -2,9 +2,10 @@ CREATE TYPE "public"."currentStatus" AS ENUM('open', 'closed', 'future');--> sta
 CREATE TYPE "public"."phase" AS ENUM('Phase I', 'Phase II', 'BOTH');--> statement-breakpoint
 CREATE TYPE "public"."program" AS ENUM('SBIR', 'STTR', 'BOTH');--> statement-breakpoint
 CREATE TABLE "solicitations" (
-	"solicitation_id" integer PRIMARY KEY NOT NULL,
-	"solicitation_title" text NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"solicitation_number" varchar(20),
+	"solicitation_id" integer,
+	"solicitation_title" text NOT NULL,
 	"program" "program" NOT NULL,
 	"phase" "phase" NOT NULL,
 	"agency" varchar(4) NOT NULL,
@@ -16,7 +17,8 @@ CREATE TABLE "solicitations" (
 	"application_due_dates" date[],
 	"occurrence_number" varchar(1),
 	"solicitation_agency_url" text NOT NULL,
-	"current_status" "currentStatus"
+	"current_status" "currentStatus",
+	CONSTRAINT "solicitations_solicitation_id_solicitation_title_unique" UNIQUE("solicitation_id","solicitation_title")
 );
 --> statement-breakpoint
 CREATE TABLE "solicitation_topics" (
@@ -40,5 +42,5 @@ CREATE TABLE "subtopics" (
 	"sbir_subtopic_link" text
 );
 --> statement-breakpoint
-ALTER TABLE "solicitation_topics" ADD CONSTRAINT "solicitation_topics_solicitation_id_solicitations_solicitation_id_fk" FOREIGN KEY ("solicitation_id") REFERENCES "public"."solicitations"("solicitation_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "solicitation_topics" ADD CONSTRAINT "solicitation_topics_solicitation_id_solicitations_id_fk" FOREIGN KEY ("solicitation_id") REFERENCES "public"."solicitations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subtopics" ADD CONSTRAINT "subtopics_solicitation_topic_id_solicitation_topics_topic_number_fk" FOREIGN KEY ("solicitation_topic_id") REFERENCES "public"."solicitation_topics"("topic_number") ON DELETE no action ON UPDATE no action;

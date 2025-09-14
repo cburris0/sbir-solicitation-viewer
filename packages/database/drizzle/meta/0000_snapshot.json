@@ -1,5 +1,5 @@
 {
-  "id": "b67a94a8-9259-43c6-abf1-2db07882c7a3",
+  "id": "74dd1921-995b-4eba-88ad-e3eaed8abe50",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -8,16 +8,10 @@
       "name": "solicitations",
       "schema": "",
       "columns": {
-        "solicitation_id": {
-          "name": "solicitation_id",
-          "type": "integer",
+        "id": {
+          "name": "id",
+          "type": "serial",
           "primaryKey": true,
-          "notNull": true
-        },
-        "solicitation_title": {
-          "name": "solicitation_title",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "solicitation_number": {
@@ -25,6 +19,18 @@
           "type": "varchar(20)",
           "primaryKey": false,
           "notNull": false
+        },
+        "solicitation_id": {
+          "name": "solicitation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "solicitation_title": {
+          "name": "solicitation_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "program": {
           "name": "program",
@@ -105,7 +111,16 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "solicitations_solicitation_id_solicitation_title_unique": {
+          "name": "solicitations_solicitation_id_solicitation_title_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "solicitation_id",
+            "solicitation_title"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -165,15 +180,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "solicitation_topics_solicitation_id_solicitations_solicitation_id_fk": {
-          "name": "solicitation_topics_solicitation_id_solicitations_solicitation_id_fk",
+        "solicitation_topics_solicitation_id_solicitations_id_fk": {
+          "name": "solicitation_topics_solicitation_id_solicitations_id_fk",
           "tableFrom": "solicitation_topics",
           "tableTo": "solicitations",
           "columnsFrom": [
             "solicitation_id"
           ],
           "columnsTo": [
-            "solicitation_id"
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
