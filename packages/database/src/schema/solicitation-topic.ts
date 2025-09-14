@@ -6,7 +6,7 @@ import { solicitation } from "./solicitation";
 
 export const solicitationTopic = pgTable("solicitation_topics", {
     topicNumber: text("topic_number").primaryKey().notNull(),
-    solicitationId: integer("solicitation_id").references(() => solicitation.solicitationId),
+    solicitationId: integer("solicitation_id").references(() => solicitation.id),
     topicTitle: text("topic_title").notNull(),
     branch: text("branch"),
     topicOpenDate: date("topic_open_date"),
@@ -18,7 +18,7 @@ export const solicitationTopic = pgTable("solicitation_topics", {
 export const solicitationTopicsRelations = relations(solicitationTopic, ({ one, many }) => ({
     solicitation: one(solicitation, {
         fields: [solicitationTopic.solicitationId],
-        references: [solicitation.solicitationId]
+        references: [solicitation.id]
     }),
     subtopics: many(subtopic)
 }));

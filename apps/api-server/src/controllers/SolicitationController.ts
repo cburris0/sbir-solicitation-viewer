@@ -1,5 +1,5 @@
 import * as data from "data/sbir-resp.json";
-import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, getSolicitationBySolicitationId, listSolicitations } from "services/SolicitationService";
+import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, getSolicitationById, listSolicitations } from "services/SolicitationService";
 import { SolicitationInsert, SolicitationTopicInsert, SubtopicInsert } from "@repo/database";
 import { GetSolicitationResponse, ListAllSolicitationsResponse, SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
 import { TRPCError } from "@trpc/server";
@@ -24,7 +24,7 @@ export async function listAllSolicitations(query: SolicitationsQueryParams | und
 export async function getSolicitation(req: SolicitationRequestParams): Promise<GetSolicitationResponse>
 {
     console.log("Fetching solicitation by id");
-    const solicitation = await getSolicitationBySolicitationId(req.id);
+    const solicitation = await getSolicitationById(req.id);
     if (solicitation)
         return solicitation;
 
@@ -52,26 +52,29 @@ export async function loadSolicitations(): Promise<void>
         {
             console.log(`Inserting ${rawSolicitation.solicitation_id}`);
             const solicitation = transformSolicitationData(rawSolicitation);
-            await createNewSolicitation(solicitation);
-
-            for (const rawSolicitationTopic of rawSolicitation.solicitation_topics)
+            const newSolicitation = await createNewSolicitation(solicitation);
+            if (newSolicitation)
             {
-                const solicitationTopic = transformSolicitationTopicData(rawSolicitationTopic, solicitation.solicitationId);
-                await createNewSolicitationTopic(solicitationTopic);
-
-                const validSubtopics = rawSolicitationTopic.subtopics.filter(subtopic => 
-                    subtopic && Object.keys(subtopic).length > 0
-                );
-
-                if (validSubtopics.length > 0)
+                for (const rawSolicitationTopic of rawSolicitation.solicitation_topics)
                 {
-                    for (const rawSubtopic of rawSolicitationTopic.subtopics)
+                    const solicitationTopic = transformSolicitationTopicData(rawSolicitationTopic, newSolicitation.id);
+                    await createNewSolicitationTopic(solicitationTopic);
+    
+                    const validSubtopics = rawSolicitationTopic.subtopics.filter(subtopic => 
+                        subtopic && Object.keys(subtopic).length > 0
+                    );
+    
+                    if (validSubtopics.length > 0)
                     {
-                        const subtopic = transformSubtopicData(rawSubtopic, solicitationTopic.topicNumber);
-                        await createNewSubtopic(subtopic);
+                        for (const rawSubtopic of rawSolicitationTopic.subtopics)
+                        {
+                            const subtopic = transformSubtopicData(rawSubtopic, solicitationTopic.topicNumber);
+                            await createNewSubtopic(subtopic);
+                        }
                     }
                 }
             }
+
         }
     }
     catch (err)

@@ -1,23 +1,22 @@
-import db, { eq, solicitation, SolicitationInsert, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
+import db, { and, eq, solicitation, SolicitationInsert, SolicitationSelect, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
 import { SolicitationWithRelations } from "models/solicitations";
+import { PostgresError } from "postgres";
 
-export async function createNewSolicitation(solicitationData: SolicitationInsert): Promise<void>
+export async function createNewSolicitation(solicitationData: SolicitationInsert): Promise<SolicitationSelect | null>
 {
     try
     {
-        const existingSolicitation = await getSolicitationBySolicitationId(solicitationData.solicitationId);
-
-        if (existingSolicitation)
-        {
-            console.warn(`Solicitation ${solicitationData.solicitationId} already exists`);
-            return;
-        }
-
         console.log(`Creating new solicitation: ${solicitationData.solicitationId}`);
-        await db.insert(solicitation).values(solicitationData);
+        const [newSolicitation] = await db.insert(solicitation).values(solicitationData).returning();
+        return newSolicitation;
     }
-    catch (error)
+    catch (error: any)
     {
+        if (error instanceof PostgresError && error.code === '23505') 
+        {
+            console.warn(`Duplicate solicitation detected: ${solicitationData.solicitationTitle}`);
+            return null;
+        }
         console.error(error);
         throw error;
     }
@@ -90,12 +89,12 @@ export async function listSolicitations(): Promise<SolicitationWithRelations[]>
     }
 }
 
-export async function getSolicitationBySolicitationId(solicitationId: number): Promise<SolicitationWithRelations | undefined>
+export async function getSolicitationById(id: number): Promise<SolicitationWithRelations | undefined>
 {
     try
     {
         const existingSolicitation = await db.query.solicitation.findFirst({
-            where: eq(solicitation.solicitationId, solicitationId),
+            where: eq(solicitation.id, id),
             with: {
                 solicitationTopics: {
                     with: {
