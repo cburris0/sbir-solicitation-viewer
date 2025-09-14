@@ -28,13 +28,25 @@ const config = {
   username: DATABASE_USERNAME,
   password: DATABASE_PASSWORD,
   db: DATABASE_NAME,
-  ssl: false
+  ssl: false,
+  // NOTE: Commented out ssl because of local dev issues
   // ssl: process.env.DATABASE_SSL_DISABLED !== "true" && {
   //   rejectUnauthorized: false,
   // },
 };
 
-const db = drizzle(postgres(config), { schema });
+const client = postgres(config)
+const db = drizzle(client, { schema });
+
+client`SELECT 1`.catch(err => {
+  console.error('DATABASE CONNECTION FAILED:', err.message);
+  console.error('Make sure Docker/PostgreSQL is running!');
+  process.exit(1);
+});
+
+export async function closeDatabase() {
+  await client.end();
+}
 
 // client
 export default db;

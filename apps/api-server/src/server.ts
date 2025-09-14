@@ -5,6 +5,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
 import { router } from "./router";
 import { createContext } from "./trpc";
+import { closeDatabase } from "@repo/database";
 
 const PORT = process.env.PORT || 8080;
 
@@ -77,9 +78,27 @@ async function launch() {
   });
 
   // graceful shutdown
+  process.on("SIGINT", () => {
+    console.log("SIGINT received. Shutting down gracefully...");
+    server.close(async () => {
+      await closeDatabase();
+      console.log("Server closed");
+      process.exit(0);
+    });
+
+    // force close after 30 seconds
+    setTimeout(() => {
+      console.error(
+        "Could not close connections in time, forcefully shutting down",
+      );
+      process.exit(1);
+    }, 30 * 1000);
+  });
+
   process.on("SIGTERM", () => {
     console.log("SIGTERM received. Shutting down gracefully...");
-    server.close(() => {
+    server.close(async () => {
+      await closeDatabase();
       console.log("Server closed");
       process.exit(0);
     });
