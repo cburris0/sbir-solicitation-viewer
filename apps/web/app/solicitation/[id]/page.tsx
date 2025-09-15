@@ -9,7 +9,7 @@ export default function SolicitationPage({ params }: { params: Promise<{ id: str
 {
     const router = useRouter();
     const { id } = use(params);
-	const { data: solicitation, isLoading, error } = trpc.solicitations.getSolicitation.useQuery({id: parseInt(id)});
+	const { data: solicitation, isLoading, error } = trpc.solicitations.getSolicitation.useQuery({id: id});
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -144,10 +144,10 @@ export default function SolicitationPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {topic.sbirSubtopicLink && (
+                            {topic.sbirTopicLink && (
                                 <div className={styles.topicLink}>
                                     <a 
-                                        href={topic.sbirSubtopicLink} 
+                                        href={topic.sbirTopicLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         className={styles.externalLink}

@@ -6,7 +6,7 @@ import SolicitationItem from "./components/SolicitationItem";
 import { useMemo, useState, useEffect } from "react";
 
 export default function Home() {
-    const { data, isLoading, error } = trpc.solicitations.listSolicitations.useQuery();
+    const { data: solicitations, isLoading, error } = trpc.solicitations.listSolicitations.useQuery();
 	const [searchTerm, setSearchTerm] = useState("");
 	
     useEffect(() => {
@@ -15,22 +15,23 @@ export default function Home() {
 
 	// Filter solicitations based on search term
 	const filteredSolicitations = useMemo(() => {
-		if (!data || !searchTerm.trim()) {
-			return data || [];
+		if (!solicitations || !searchTerm.trim()) {
+			return solicitations || [];
 		}
 		
 		const searchLower = searchTerm.toLowerCase();
-		return data.filter((solicitation) => {
+		return solicitations.filter((solicitation) => {
 			return (
 				solicitation.solicitationTitle.toLowerCase().includes(searchLower) ||
 				solicitation.agency.toLowerCase().includes(searchLower) ||
 				solicitation.program.toLowerCase().includes(searchLower) ||
 				(solicitation.phase !== "BOTH" && solicitation.phase.toLowerCase().includes(searchLower)) ||
 				(solicitation.solicitationNumber && solicitation.solicitationNumber.toLowerCase().includes(searchLower)) ||
+                (solicitation.solicitationId && solicitation.solicitationId.toString().includes(searchLower)) ||
 				(solicitation.branch && solicitation.branch.toLowerCase().includes(searchLower))
 			);
 		});
-	}, [data, searchTerm]);
+	}, [solicitations, searchTerm]);
 	return (
        <>
             <div className={styles.searchContainer}>

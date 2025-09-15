@@ -19,11 +19,12 @@ export const createContext = async (
 export const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
     return {
-      ...shape,
+      message: shape.message,
+      code: shape.code,
       data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        code: shape.data.code,
+        httpStatus: shape.data.httpStatus,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -54,24 +55,28 @@ const errorHandler = t.middleware(
     const res = await next();
 
     if (!res.ok) {
-      const rawInput = await getRawInput();
-      const timestamp = new Date();
-      const statusCode = getHTTPStatusCodeFromError(res.error);
-      const errorObject = {
-        timestamp,
-        env: process.env.NODE_ENV,
-        path,
-        input,
-        rawInput: JSON.stringify(rawInput),
-        statusCode,
-        error: res.error,
-      };
+      const error = res.error;
+      
+      if (error.code === 'INTERNAL_SERVER_ERROR' || 
+          error.code === 'PARSE_ERROR' ||
+          error.code === 'TIMEOUT') {
+        
+        const rawInput = await getRawInput();
+        const errorObject = {
+          timestamp: new Date().toISOString(),
+          path,
+          input,
+          rawInput: JSON.stringify(rawInput),
+          statusCode: getHTTPStatusCodeFromError(error),
+          error: error.message,
+          code: error.code
+        };
 
-      console.error("Error Occured in TRPC:", errorObject);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "An unexpected error occurred",
-      });
+        console.error("Unexpected TRPC Error:", errorObject);
+      } else {
+        console.info(`Client error ${error.code}: ${error.message}`);
+      }
+      throw error;
     }
 
     return res;

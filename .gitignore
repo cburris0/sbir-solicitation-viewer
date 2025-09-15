@@ -5,6 +5,11 @@ node_modules
 .pnp
 .pnp.js
 
+# Drizzle metadata
+drizzle/meta/*
+drizzle/.snapshots/
+
+
 # Local env files
 .env
 .env.local

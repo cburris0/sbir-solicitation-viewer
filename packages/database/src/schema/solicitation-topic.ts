@@ -1,12 +1,13 @@
 import { relations } from "drizzle-orm";
-import { date, text, pgTable, integer } from "drizzle-orm/pg-core";
+import { date, text, pgTable, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { subtopic } from "./subtopic";
 import { solicitation } from "./solicitation";
 
 export const solicitationTopic = pgTable("solicitation_topics", {
-    topicNumber: text("topic_number").primaryKey().notNull(),
-    solicitationId: integer("solicitation_id").references(() => solicitation.id),
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    topicNumber: text("topic_number").notNull(),
+    solicitationId: uuid("solicitation_id").references(() => solicitation.id).notNull(),
     topicTitle: text("topic_title").notNull(),
     branch: text("branch"),
     topicOpenDate: date("topic_open_date"),

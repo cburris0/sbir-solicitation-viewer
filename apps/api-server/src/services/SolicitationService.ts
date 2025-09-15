@@ -1,5 +1,5 @@
-import db, { and, eq, solicitation, SolicitationInsert, SolicitationSelect, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
-import { SolicitationWithRelations } from "models/solicitations";
+import db, { eq, solicitation, SolicitationInsert, SolicitationSelect, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
+import { ISolicitation } from "interfaces/ISolicitation";
 import { PostgresError } from "postgres";
 
 export async function createNewSolicitation(solicitationData: SolicitationInsert): Promise<SolicitationSelect | null>
@@ -66,7 +66,7 @@ export async function createNewSubtopic(subtopicData: SubtopicInsert): Promise<v
     }
 }
 
-export async function listSolicitations(): Promise<SolicitationWithRelations[]>
+export async function listSolicitations(): Promise<ISolicitation[]>
 {
     try
     {
@@ -89,7 +89,7 @@ export async function listSolicitations(): Promise<SolicitationWithRelations[]>
     }
 }
 
-export async function getSolicitationById(id: number): Promise<SolicitationWithRelations | undefined>
+export async function getSolicitationById(id: string): Promise<ISolicitation | undefined>
 {
     try
     {

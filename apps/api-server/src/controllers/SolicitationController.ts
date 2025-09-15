@@ -10,13 +10,14 @@ export async function listAllSolicitations(query: SolicitationsQueryParams | und
     {
         console.log("Fetching list of solicitations");
         const solicitations = await listSolicitations();
-        return solicitations;
+        return ListAllSolicitationsResponse.parse(solicitations);
     }
     catch (err)
     {
+        console.error("Error fetching solicitations:", err);
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Solicitation not found"
+            message: "Failed to fetch solicitations"
         });
     }
 }
@@ -25,13 +26,15 @@ export async function getSolicitation(req: SolicitationRequestParams): Promise<G
 {
     console.log("Fetching solicitation by id");
     const solicitation = await getSolicitationById(req.id);
-    if (solicitation)
-        return solicitation;
-
-    throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Solicitation not found"
-    });
+    if (!solicitation)
+    {
+        throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Solicitation not found"
+        });
+    }
+    
+    return GetSolicitationResponse.parse(solicitation)
 }
 
 export async function loadSolicitations(): Promise<void>
@@ -39,13 +42,6 @@ export async function loadSolicitations(): Promise<void>
     try
     {
         console.log("Loading solicitation data...");
-
-        // fetch data from SBIR endpoint
-        // const url = new URL(process.env.SBIR_SOLICITATION_ENDPOINT);
-        // const response = await fetch(url);
-        // console.log(`Response from API: ${response.json()}`);
-
-        // but actually let's get them from the json file
         const res = data;
 
         for (const rawSolicitation of res)
@@ -100,14 +96,20 @@ export async function loadSolicitations(): Promise<void>
             releaseDate: rawData.release_date,
             openDate: rawData.open_date,
             closeDate: rawData.close_date,
-            applicationDueDate: [rawData.application_due_date],
+
+            // Respect application due date as a string or as an array, to account for old data vs data dictionary mismatch
+            applicationDueDate: rawData.application_due_date ?
+                (Array.isArray(rawData.application_due_date) ?
+                    rawData.application_due_date :
+                    [rawData.application_due_date]) :
+                null,
             occurrenceNumber: rawData.occurrence_number,
             solicitationAgencyUrl: rawData.solicitation_agency_url,
             currentStatus: rawData.current_status
         }
     }
 
-    function transformSolicitationTopicData(rawTopic: any, solicitationId: number): SolicitationTopicInsert 
+    function transformSolicitationTopicData(rawTopic: any, solicitationId: string): SolicitationTopicInsert
     {
         return {
             topicNumber: rawTopic.topic_number,
@@ -121,7 +123,7 @@ export async function loadSolicitations(): Promise<void>
         };
     }
 
-    function transformSubtopicData(rawSubtopic: any, topicNumber: string): SubtopicInsert 
+    function transformSubtopicData(rawSubtopic: any, topicNumber: string): SubtopicInsert
     {
         return {
             solicitationTopicId: topicNumber,
