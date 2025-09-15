@@ -18,28 +18,26 @@ export default function RootLayout({
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: 'http://localhost:8080/trpc',
-          transformer: SuperJSON
+          url: `${process.env.NEXT_PUBLIC_API_SERVER_URL}`,
         }),
       ],
-    })
+    }),
   );
 
   return (
     <html lang="en">
       <body>
         <div>
-        <trpc.Provider client={trpcClient} queryClient={queryClient}>
-          <QueryClientProvider client={queryClient}>
-          <div className={styles.page}>
-            <Header title="SBIR Solicitation Viewer" />
-            <main className={styles.main}>
-              {children}
-            </main>
-          </div>
-          </QueryClientProvider>
-        </trpc.Provider>
-
+          <trpc.Provider client={trpcClient} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+              <div className={styles.page}>
+                <Header title="SBIR Solicitation Viewer" />
+                <main className={styles.main}>
+                  {children}
+                </main>
+              </div>
+            </QueryClientProvider>
+          </trpc.Provider>
         </div>
       </body>
     </html>

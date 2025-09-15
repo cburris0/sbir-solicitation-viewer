@@ -10,7 +10,7 @@ export async function listAllSolicitations(query: SolicitationsQueryParams | und
     {
         console.log("Fetching list of solicitations");
         const solicitations = await listSolicitations();
-        return { solicitations: solicitations };
+        return solicitations;
     }
     catch (err)
     {

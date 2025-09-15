@@ -24,14 +24,11 @@ export const SolicitationRequestParams = z.object({
     id: z.number()
 });
 
-export const ListAllSolicitationsResponse = z.object({
-    solicitations: z.array(SolicitationWithRelations)
-})
+export const ListAllSolicitationsResponse = z.array(SolicitationWithRelations);
 
 export const GetSolicitationResponse = SolicitationWithRelations.extend({
 
 });
-
 
 export type SolicitationWithRelations = z.infer<typeof SolicitationWithRelations>;
 export type SolicitationsQueryParams = z.infer<typeof SolicitationsQueryParams>;

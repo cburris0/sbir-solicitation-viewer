@@ -4,10 +4,9 @@ import styles from "./page.module.css";
 import { trpc } from "./utils/trpc";
 import SolicitationItem from "./components/SolicitationItem";
 import { useMemo, useState, useEffect } from "react";
-import { Solicitation } from "./interfaces/Solicitation";
 
 export default function Home() {
-	const { data, isLoading, error } = trpc.solicitations.listSolicitations.useQuery();
+    const { data, isLoading, error } = trpc.solicitations.listSolicitations.useQuery();
 	const [searchTerm, setSearchTerm] = useState("");
 	
     useEffect(() => {
@@ -16,12 +15,12 @@ export default function Home() {
 
 	// Filter solicitations based on search term
 	const filteredSolicitations = useMemo(() => {
-		if (!data?.solicitations || !searchTerm.trim()) {
-			return data?.solicitations || [];
+		if (!data || !searchTerm.trim()) {
+			return data || [];
 		}
 		
 		const searchLower = searchTerm.toLowerCase();
-		return data.solicitations.filter((solicitation: Solicitation) => {
+		return data.filter((solicitation) => {
 			return (
 				solicitation.solicitationTitle.toLowerCase().includes(searchLower) ||
 				solicitation.agency.toLowerCase().includes(searchLower) ||
@@ -31,9 +30,8 @@ export default function Home() {
 				(solicitation.branch && solicitation.branch.toLowerCase().includes(searchLower))
 			);
 		});
-	}, [data?.solicitations, searchTerm]);
+	}, [data, searchTerm]);
 	return (
-        // We wrap the component in a react fragment since we can only return a single element
        <>
             <div className={styles.searchContainer}>
                 <input
@@ -65,7 +63,7 @@ export default function Home() {
                 <div className={styles.noSolicitations}>No Solicitations to Show</div>
             )}
 
-            {filteredSolicitations.map((solicitation: Solicitation) => (
+            {filteredSolicitations.map((solicitation) => (
                 <SolicitationItem
                     key={solicitation.id || solicitation.solicitationTitle}
                     solicitation={solicitation}

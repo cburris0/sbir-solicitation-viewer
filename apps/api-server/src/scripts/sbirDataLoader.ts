@@ -4,10 +4,9 @@ async function loadSolicitationData()
 {
     try
     {
-        const response = await fetch(`${process.env.API_ENDPOINT}/solicitations.loadSolicitations`);
-        const result = await response.json();
-        console.log('Result:', result)
-        console.log("Data loaded successfully");
+        console.log("BEGINNING DATA LOAD...");
+        await fetch(`${process.env.API_ENDPOINT}/api/load-solicitations`);
+        console.log("SBIR DATA LOAD COMPLETE");
     }
     catch (error)
     {

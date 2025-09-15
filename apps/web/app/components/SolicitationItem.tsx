@@ -1,9 +1,9 @@
 import React from "react";
-import { Solicitation } from "app/interfaces/Solicitation";
 import styles from "./solicitation-item.module.css";
 import { useRouter } from "next/navigation";
+import { SolicitationData } from "app/utils/trpc";
 
-export default function SolicitationItem({ solicitation }: { solicitation: Solicitation }) {
+export default function SolicitationItem({ solicitation }: { solicitation: SolicitationData }) {
     const router = useRouter();
 
     const formatDate = (dateString: string) => {

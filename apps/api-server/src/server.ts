@@ -6,6 +6,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { router } from "./router";
 import { createContext } from "./trpc";
 import { closeDatabase } from "@repo/database";
+import { loadSolicitations } from "controllers/SolicitationController";
 
 const PORT = process.env.PORT || 8080;
 
@@ -20,6 +21,16 @@ async function launch() {
   // health and test endpoints that don't require authentication
   app.get("/health", (_, res) => {
     res.status(200).send("healthy");
+  });
+
+  app.post('/api/load-solicitations', async (req, res) => {
+    try {
+      await loadSolicitations();
+      res.json({ success: true, message: 'Solicitations loaded successfully' });
+    } catch (error) {
+      console.error('Error loading solicitations:', error);
+      res.status(500).json({ success: false, error: 'Failed to load solicitations' });
+    }
   });
 
   // request logger
