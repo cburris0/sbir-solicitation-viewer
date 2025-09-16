@@ -15,7 +15,7 @@ API_ENDPOINT=http://localhost:8080
 
 ```sh
 # apps/web/.env
-NEXT_PUBLIC_API_SERVER_URL=http: /localhost:8080 
+NEXT_PUBLIC_API_SERVER_URL=http://localhost:8080/trpc
 ```
 
 ```sh
