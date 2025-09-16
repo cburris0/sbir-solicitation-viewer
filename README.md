@@ -34,6 +34,7 @@ docker compose up
 
 From /packages/database, run the following to migrate database
 ```sh
+pnpm run generate
 pnpm run migrate
 ```
 
