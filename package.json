@@ -1,5 +1,5 @@
 {
-  "name": "obv-exercise",
+  "name": "sbir-solicitation-viewer",
   "private": true,
   "scripts": {
     "build": "turbo run build",

@@ -10,6 +10,7 @@ DATABASE_PORT=5432
 DATABASE_USERNAME=postgres
 DATABASE_PASSWORD=postgres
 DATABASE_NAME=postgres
+API_ENDPOINT=http://localhost:8080
 ```
 
 ```sh
@@ -43,10 +44,12 @@ From project root, run the following to start api server and web server
 ```sh
 npm i -G pnpm
 pnpm i
-pnpm dev
+pnpm run build
+pnpm run dev
 ```
 
 After the server is running, load solicitation data with the following
 ```sh
+cd apps/api-server/
 pnpm run load-data
 ```
