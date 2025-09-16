@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { date, varchar, text, pgTable, integer, pgEnum, serial, unique, uuid } from "drizzle-orm/pg-core";
+import { date, varchar, text, pgTable, integer, pgEnum, unique, uuid, index } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { solicitationTopic } from "./solicitation-topic";
 
@@ -25,11 +25,15 @@ export const solicitation = pgTable("solicitations", {
     solicitationAgencyUrl: text("solicitation_agency_url").notNull(),
     currentStatus: currentStatusEnum("current_status")
 }, (table) => ({
-    uniqueSolicitation: unique().on(table.solicitationId, table.solicitationTitle)
-}));
+		uniqueSolicitation: unique().on(table.solicitationId, table.solicitationTitle),
+		solicitationNumberIdx: index("solicitation_number_idx").on(table.solicitationNumber),
+		solicitationIdIdx: index("solicitation_id_idx").on(table.solicitationId),
+		programIdx: index("program_idx").on(table.program),
+	}),
+);
 
 export const solicitationRelations = relations(solicitation, ({ many }) => ({
-    solicitationTopics: many(solicitationTopic)
+	solicitationTopics: many(solicitationTopic),
 }));
 
 export type SolicitationSelect = typeof solicitation.$inferSelect;
