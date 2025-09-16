@@ -3,18 +3,19 @@ import { createNewSolicitation, createNewSolicitationTopic, createNewSubtopic, g
 import { SolicitationInsert, SolicitationTopicInsert, SubtopicInsert } from "@repo/database";
 import { GetSolicitationResponse, ListAllSolicitationsResponse, SolicitationRequestParams, SolicitationsQueryParams } from "models/solicitations";
 import { TRPCError } from "@trpc/server";
+import { logger } from "../lib/logger";
 
 export async function listAllSolicitations(query: SolicitationsQueryParams | undefined): Promise<ListAllSolicitationsResponse>
 {
     try
     {
-        console.log("Fetching list of solicitations");
-        const solicitations = await listSolicitations();
+        logger.info("Fetching list of solicitations");
+        const solicitations = await listSolicitations(query);
         return ListAllSolicitationsResponse.parse(solicitations);
     }
     catch (err)
     {
-        console.error("Error fetching solicitations:", err);
+        logger.error(`Error fetching solicitations: ${err}`);
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Failed to fetch solicitations"
@@ -24,7 +25,7 @@ export async function listAllSolicitations(query: SolicitationsQueryParams | und
 
 export async function getSolicitation(req: SolicitationRequestParams): Promise<GetSolicitationResponse>
 {
-    console.log("Fetching solicitation by id");
+    logger.info("Fetching solicitation by id");
     const solicitation = await getSolicitationById(req.id);
     if (!solicitation)
     {
@@ -41,12 +42,12 @@ export async function loadSolicitations(): Promise<void>
 {
     try
     {
-        console.log("Loading solicitation data...");
+        logger.info("Loading solicitation data...");
         const res = data;
 
         for (const rawSolicitation of res)
         {
-            console.log(`Inserting ${rawSolicitation.solicitation_id}`);
+            logger.info(`Attempting to create solicitation ${rawSolicitation.solicitation_id}...`);
             const solicitation = transformSolicitationData(rawSolicitation);
             const newSolicitation = await createNewSolicitation(solicitation);
             if (newSolicitation)

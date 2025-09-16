@@ -5,9 +5,9 @@ async function loadSolicitationData()
     try
     {
         console.log("BEGINNING DATA LOAD...");
-    await fetch(`${process.env.API_ENDPOINT}/api/load-solicitations`, {
-        method: "POST"
-    });
+        await fetch(`${process.env.API_ENDPOINT}/api/load-solicitations`, {
+            method: "POST"
+        });
         console.log("SBIR DATA LOAD COMPLETE");
     }
     catch (error)

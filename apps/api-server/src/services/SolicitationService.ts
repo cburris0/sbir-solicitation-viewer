@@ -1,5 +1,6 @@
 import db, { and, eq, solicitation, SolicitationInsert, SolicitationSelect, solicitationTopic, SolicitationTopicInsert, subtopic, SubtopicInsert } from "@repo/database";
 import { ISolicitation } from "interfaces/ISolicitation";
+import { logger } from "lib/logger";
 import { SolicitationsQueryParams } from "models/solicitations";
 import { PostgresError } from "postgres";
 
@@ -7,7 +8,6 @@ export async function createNewSolicitation(solicitationData: SolicitationInsert
 {
 	try
 	{
-		console.log(`Creating new solicitation: ${solicitationData.solicitationId}`);
 		const [newSolicitation] = await db.insert(solicitation).values(solicitationData).returning();
 		return newSolicitation;
 	} 
@@ -15,10 +15,10 @@ export async function createNewSolicitation(solicitationData: SolicitationInsert
 	{
 		if (error instanceof PostgresError && error.code === "23505") 
 		{
-			console.warn(`Duplicate solicitation detected: ${solicitationData.solicitationTitle}`);
+			logger.warn(`Duplicate solicitation detected: ${solicitationData.solicitationId}`);
 			return null;
 		}
-		console.error(error);
+		logger.error(`Error creating new solicitation: ${error}`);
 		throw error;
 	}
 }
@@ -33,17 +33,16 @@ export async function createNewSolicitationTopic(solicitationTopicData: Solicita
 			.where(eq(solicitationTopic.topicNumber, solicitationTopicData.topicNumber));
 
 		if (existingSolicitationTopic.length > 0) 
-			{
-			console.warn(`Solicitation topic ${solicitationTopicData.solicitationId} already exists`);
+		{
+			logger.warn(`Solicitation topic ${solicitationTopicData.solicitationId} already exists`);
 			return;
 		}
 
-		console.log(`Creating new solicitation topic: ${solicitationTopicData.topicNumber}`);
 		await db.insert(solicitationTopic).values(solicitationTopicData);
 	} 
 	catch (error) 
 	{
-		console.error(error);
+		logger.error(`Error creating new solicitation topic: ${error}`);
 		throw error;
 	}
 }
@@ -59,16 +58,15 @@ export async function createNewSubtopic(subtopicData: SubtopicInsert): Promise<v
 
 		if (existingSubtopic.length > 0) 
 		{
-			console.warn(`Subtopic ${subtopic.solicitationTopicId} already exists`);
+			logger.warn(`Subtopic ${subtopic.solicitationTopicId} already exists`);
 			return;
 		}
 
-		console.log(`Creating new subtopic`);
 		await db.insert(subtopic).values(subtopicData);
 	} 
 	catch (error) 
 	{
-		console.error(error);
+		logger.error(`Error creating new subtopic: ${error}`);
 		throw error;
 	}
 }
@@ -100,7 +98,7 @@ export async function listSolicitations(query?: SolicitationsQueryParams): Promi
 	} 
 	catch (error) 
 	{
-		console.error(error);
+		logger.error(`Error listing solicitations: ${error}`);
 		throw error;
 	}
 }
@@ -123,7 +121,7 @@ export async function getSolicitationById(id: string): Promise<ISolicitation | u
 	} 
 	catch (error) 
 	{
-		console.error(error);
+		logger.error(`Error getting solicitation ${id}: ${error}`);
 		throw error;
 	}
 }
